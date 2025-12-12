@@ -1,4 +1,4 @@
-package traversium.ModerationService
+package traversium.moderation
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
