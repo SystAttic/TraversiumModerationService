@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package traversium.moderation.textmoderation;
+
+option java_multiple_files = true;
+option java_package = "traversium.moderation.v1";
+option java_outer_classname = "ModerationProto";
+
+message ModerateTextRequest {
+  string text = 1;
+  string language = 2; // optional, e.g. "en"
+}
+
+message Label {
+  string name = 1;
+  double score = 2; // 0..1
+}
+
+message ModerateTextResponse {
+  repeated Label labels = 1;
+  bool blocked = 2; // true = should block / human review
+  string reason = 3; // short reason code
+}
+
+service Moderation {
+  rpc ModerateText (ModerateTextRequest) returns (ModerateTextResponse);
+}
