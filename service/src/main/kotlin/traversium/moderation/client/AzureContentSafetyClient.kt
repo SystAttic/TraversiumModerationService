@@ -33,7 +33,7 @@ class AzureContentSafetyClient(
             .bodyToMono(AzureModerationResponse::class.java)
             .block()!!
     }
-
+    @Suppress("unused")
     private fun fallback(text: String, ex: Throwable): AzureModerationResponse {
         logger.error("Azure moderation failed: ${ex.message}")
         return AzureModerationResponse.safeFallback()
