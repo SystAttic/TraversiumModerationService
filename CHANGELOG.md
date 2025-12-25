@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prometheus metrics endpoint
 - Healthcheck endpoint
 - ELK stack integration for log management
+- Support for config server
 
 ## [1.0.1] - 2025-12-18
 ### Fixed
