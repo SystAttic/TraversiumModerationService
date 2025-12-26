@@ -102,4 +102,92 @@ class ModerationServiceTest {
         assertEquals("Azure down", ex.message)
     }
 
+    @Test
+    fun `blocks text when severity equals threshold`() {
+        `when`(azureClient.analyze(anyString()))
+            .thenReturn(azureResponse(listOf(4)))
+
+        val result = service.moderate(
+            ModerateTextRequestDto("borderline text")
+        )
+
+        assertFalse(result.allowed)
+        assertEquals(4, result.maxSeverity)
+        assertEquals("SEVERITY_THRESHOLD_EXCEEDED", result.decisionReason)
+    }
+
+    @Test
+    fun `allows text when no categories returned`() {
+        `when`(azureClient.analyze(anyString()))
+            .thenReturn(
+                AzureModerationResponse(
+                    categoriesAnalysis = emptyList(),
+                    blocklistsMatch = emptyList()
+                )
+            )
+
+        val result = service.moderate(
+            ModerateTextRequestDto("neutral text")
+        )
+
+        assertTrue(result.allowed)
+        assertEquals(0, result.maxSeverity)
+        assertNull(result.decisionReason)
+    }
+
+    @Test
+    fun `blocklist hit blocks even when severity is zero`() {
+        `when`(azureClient.analyze(anyString()))
+            .thenReturn(azureResponse(listOf(0), blocklistHits = true))
+
+        val result = service.moderate(
+            ModerateTextRequestDto("blocked text")
+        )
+
+        assertFalse(result.allowed)
+        assertEquals("SEVERITY_THRESHOLD_EXCEEDED", result.decisionReason)
+    }
+
+    @Test
+    fun `changing policy severity affects decision`() {
+        policy.blockSeverity = 2
+
+        `when`(azureClient.analyze(anyString()))
+            .thenReturn(azureResponse(listOf(3)))
+
+        val result = service.moderate(
+            ModerateTextRequestDto("policy sensitive")
+        )
+
+        assertFalse(result.allowed)
+        assertEquals(3, result.maxSeverity)
+    }
+
+    @Test
+    fun `uses highest category severity`() {
+        `when`(azureClient.analyze(anyString()))
+            .thenReturn(azureResponse(listOf(1, 7, 3)))
+
+        val result = service.moderate(
+            ModerateTextRequestDto("mixed content")
+        )
+
+        assertFalse(result.allowed)
+        assertEquals(7, result.maxSeverity)
+    }
+
+    @Test
+    fun `handles blank input safely`() {
+        `when`(azureClient.analyze(""))
+            .thenReturn(azureResponse(listOf(0)))
+
+        val result = service.moderate(
+            ModerateTextRequestDto("")
+        )
+
+        assertTrue(result.allowed)
+    }
+
+
+
 }

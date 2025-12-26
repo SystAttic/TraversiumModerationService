@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Healthcheck endpoint
 - ELK stack integration for log management
 - Support for config server
+- Keycloak security for service-to-service gRPC communication 
 
 ## [1.0.1] - 2025-12-18
 ### Fixed
